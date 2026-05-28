@@ -1,0 +1,60 @@
+x-common-config:
+  &common-config
+  image: ${HARIBDA_IMAGE}
+  privileged: true
+  stop_grace_period: "5m"
+  environment:
+    HARIBDA_IMAGE: ${HARIBDA_IMAGE}
+    SEEDS: ${SEEDS}
+  networks:
+    - default
+  tmpfs:
+      - /run
+      - /tmp
+  env_file:
+      - ./.env
+  deploy:
+    resources:
+      limits:
+        cpus: "4"
+        memory: 4G 
+      reservations:
+        memory: 4G 
+  memswap_limit: 6G
+
+services:
+  haribda-01:
+    <<: *common-config
+    container_name: ${SEEDS}
+    hostname: ${SEEDS}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - .env:/setup/utils.d/haribda.sh:ro
+      - ./data-01/etc_scylla:/etc/scylla
+      - ./data-01/etc_scylla.d:/etc/scylla.d
+      - ./data-01/var_lib_scylla:/var/lib/scylla
+
+  haribda-02:
+    <<: *common-config
+    container_name: haribda-02
+    hostname: haribda-02
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - .env:/setup/utils.d/haribda.sh:ro
+      - ./data-02/etc_scylla:/etc/scylla
+      - ./data-02/etc_scylla.d:/etc/scylla.d
+      - ./data-02/var_lib_scylla:/var/lib/scylla
+
+  haribda-03:
+    <<: *common-config
+    container_name: haribda-03
+    hostname: haribda-03
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - .env:/setup/utils.d/haribda.sh:ro
+      - ./data-03/etc_scylla:/etc/scylla
+      - ./data-03/etc_scylla.d:/etc/scylla.d
+      - ./data-03/var_lib_scylla:/var/lib/scylla
+
+networks:
+  default:
