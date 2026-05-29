@@ -4,7 +4,6 @@ set -x
 DIR="$(cd "$(dirname "$0")" && pwd -P)"
 . "${DIR?}/../utils.sh"
 
-PKGMGR3=$(printf "${PACKAGE_INSTALL?}" | cut -c1-3)
 if [ "${PKGMGR3?}" = "apt" ]; then
 	printf "deb [trusted=yes] https://repos.stsoft.dev/repository/haribda-deb release main\n" | tee /etc/apt/sources.list.d/haribda.list
 	PACKAGE_MAKECACHE="${PACKAGE_MAKECACHE?} -o Acquire::https::Verify-Peer=false"

@@ -36,7 +36,8 @@ fi
 
 ${PACKAGE_MAKECACHE?}
 # Install systemd & other useful packages
-${PACKAGE_INSTALL?} binutils file gzip tar vim systemd hostname procps
+${PACKAGE_INSTALL?} binutils file gzip tar vim systemd hostname procps curl wget
+[ "${PKGMGR3?}" = "apt" ] && ${PACKAGE_INSTALL?} gpg dirmngr gpg-agent
 
 # Run all setup scripts
 find "${INSTALL_SCRIPTS_DIR?}" -type f -print0 | sort -z | xargs -I {} -0 /bin/bash -c '[ -x "{}" ] && "{}"'

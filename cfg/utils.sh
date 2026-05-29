@@ -43,3 +43,5 @@ else
   echo "Unknown package manager" >&2
   exit 1
 fi
+
+PKGMGR3=$(printf "${PACKAGE_INSTALL?}" | cut -c1-3)

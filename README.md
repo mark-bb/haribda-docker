@@ -34,10 +34,23 @@ The `install.sh` script is the main build script inside an image. It does the fo
 - runs the `configs_save.sh` script which makes a copy of all your files & directories specified in the `install.d` scripts (by adding the corresponding names to a special text file, see the examples); these files & directories are supposed to be copied to the corresponding mounts provided during the run-time once
 - creates a special `startup.service` unit running the `startup.sh` script; this unit will run once before all others to configure your applications (via executable scripts in `startup.d`)
 ## Running containers
-The `run.sh` script is an example of running a container.  
+The `run.sh` script is an example of running a container on a system with cgroup v1.  
 It accepts the same `-b` parameter as for `rebuild.sh`, but just to derive the corresponding image. The container name is always `haribda`.  
 
 The `startup.sh` script is the main startup script inside a container. The `startup.service` systemd unit runs it, which is supposed to run before starting all other user systemd units. So, there is an ability to make whatever configuration changes beforehand.  
 The script does the following sequentially:
 - runs the `configs_restore.sh` script which copies saved files and directories saved at the setup stage to the correspoinding mounted ones restoring their original OS permissions and modes, if the correspoinding target is empty (directory) or hase zero size (standalone file)
 - runs all the executables found in the `startup.d` directory
+
+The `run-cgroup-v2.sh` script is an example of running a container on a system with cgroup v2.  
+You need to have the following to correspond `--cgroup-parent=docker.slice` in this script:  
+```
+$ cat /etc/docker/daemon.json
+{
+...
+"exec-opts": ["native.cgroupdriver=systemd"],
+"features": { "buildkit": true },
+"experimental": true,
+"cgroup-parent": "docker.slice"
+}
+```
