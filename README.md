@@ -13,8 +13,12 @@ cfg/
 ├── install.d
 │   ├── 50-openssh.sh
 │   ├── 60-postfix.sh
-│   └── 70-haribda.sh
+│   ├── 70-haribda.sh
+│   └── 70-scylla-2026.1.sh
 ├── install.sh
+├── shutdown.d
+│   └── test.sh
+├── shutdown.sh
 ├── startup.d
 │   ├── haribda.sh
 │   └── ssh.sh
