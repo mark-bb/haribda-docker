@@ -10,6 +10,4 @@ DIR="$(cd "$(dirname "$0")" && pwd -P)"
 "${DIR?}/configs_restore.sh"
 
 # Run all startup scripts
-find "${STARTUP_SCRIPTS_DIR?}" -type f | sort | while IFS= read -r script; do
-  [ -x "${script?}" ] && "${script?}"
-done
+find "${STARTUP_SCRIPTS_DIR?}" -type f -print0 | sort -z | xargs -I {} -0 /bin/bash -c '[ -x "{}" ] && "{}"'

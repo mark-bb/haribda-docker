@@ -10,6 +10,7 @@
 CONFIG_LIST_FILE=/setup/configs.txt
 INSTALL_SCRIPTS_DIR=/setup/install.d
 STARTUP_SCRIPTS_DIR=/setup/startup.d
+SHUTDOWN_SCRIPTS_DIR=/setup/shutdown.d
 # --env-file variables are not accessible for the startup.service
 ENV_FILES_DIR=/setup/utils.d
 if [ -d "${ENV_FILES_DIR?}" ]; then

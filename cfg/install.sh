@@ -11,9 +11,7 @@ DIR="$(cd "$(dirname "$0")" && pwd -P)"
 SECRET_DIR="/run/secrets"
 if [ -d "${SECRET_DIR?}" ]; then
   TEMP_FILE="$(mktemp)"
-  find "${SECRET_DIR?}" -type f | sort | while IFS= read -r script; do
-    cat "${script?}" | tee -a "${TEMP_FILE?}"
-  done
+  find "${SECRET_DIR?}" -type f -print0 | sort -z | xargs -0 cat | tee "${TEMP_FILE?}"
   . "${TEMP_FILE?}"
   rm -f "${TEMP_FILE?}"
 fi
@@ -38,12 +36,10 @@ fi
 
 ${PACKAGE_MAKECACHE?}
 # Install systemd & other useful packages
-${PACKAGE_INSTALL?} binutils file gzip tar vim systemd hostname
+${PACKAGE_INSTALL?} binutils file gzip tar vim systemd hostname procps
 
 # Run all setup scripts
-find "${INSTALL_SCRIPTS_DIR?}" -type f | sort | while IFS= read -r script; do
-  [ -x "${script?}" ] && "${script?}"
-done
+find "${INSTALL_SCRIPTS_DIR?}" -type f -print0 | sort -z | xargs -I {} -0 /bin/bash -c '[ -x "{}" ] && "{}"'
 
 if [ "$(printf "${PACKAGE_INSTALL?}" | cut -c1-3)" = "zyp" ]; then
   if ! getent passwd mail &>/dev/null; then
@@ -79,7 +75,24 @@ ExecStart=/setup/startup.sh
 [Install]
 WantedBy=basic.target
 EOF
+systemctl enable ${unit?}
 
+# Called before the OS shutdown
+unit=shutdown
+cat <<EOF | tee /etc/systemd/system/${unit?}.service
+[Unit]
+Description=Cleanup on shutdown if needed
+Before=shutdown.target umount.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/setup/shutdown.sh
+
+[Install]
+WantedBy=shutdown.target umount.target
+EOF
 systemctl enable ${unit?}
 
 [ -f /sbin/init ] || ln -s /lib/systemd/systemd /sbin/init
